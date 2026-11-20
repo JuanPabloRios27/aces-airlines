@@ -12,7 +12,7 @@ provider "aws"{
 }
 resource "aws_iam_role" "lambda_rol"{
     name                = "ACES-ROLES-lambda"
-    assume_role_policy    = jsonencode({Version = "0.1",Statement = [{ 
+    assume_role_policy    = jsonencode({Version = "2012-10-17",Statement = [{ 
         Effect="Allow", Action = "sts:AssumeRole", 
         Principal = { Service = "lambda.amazonaws.com" }}]})
 }
@@ -78,7 +78,7 @@ resource "aws_lambda_function" "api_seventy"{
 }
 resource "aws_dynamodb_table" "tabla_1" {
   name          = "maleta-db"
-  billing_mode  = "PROVISIONED" #Esto ayude para que llegue a la capa grautita
+  billing_mode  = "PAY_PER_REQUEST" #Esto ayude para que llegue a la capa grautita
   hash_key      = "id" #Hash key es la partition key
   range_key     = "id_registry" #Ordena el registro que van llegando las maletas
   attribute {
@@ -104,7 +104,7 @@ resource "aws_dynamodb_table" "tabla_1" {
 }
 resource "aws_dynamodb_table" "tabla_2" {
     name          = "ticket-db"
-    billing_mode  = "PROVISIONED" #Esto ayude para que llegue a la capa grautita
+    billing_mode  = "PAY_PER_REQUEST" #Esto ayude para que llegue a la capa grautita
     hash_key      = "id_ticket" #Hash key es la partition key
     attribute {
         name    =  "id_ticket"
@@ -125,7 +125,7 @@ resource "aws_dynamodb_table" "tabla_2" {
 }
 resource "aws_dynamodb_table" "tabla_3" {
   name          =   "autentification-db"
-  billing_mode  =   "PROVISIONED" #Esto ayude para que llegue a la capa grautita
+  billing_mode  =   "PAY_PER_REQUEST" #Esto ayude para que llegue a la capa grautita
   hash_key      =   "auth_id" #Hash key es la partition key
   attribute {
     name = "auth_id"
@@ -144,20 +144,20 @@ resource "aws_dynamodb_table" "tabla_3" {
     projection_type = "ALL"
   }
 }
-resource "aws_s3_bucket" "bucket_1" {
-  bucket = "maleta_almacen"
+resource "aws_s3_bucket" "bucket1" {
+  bucket = "ticket-checkin"
   tags = {
     maleta = "maleta"
   }
 }
-resource "aws_s3_bucket" "bucket_2"{
-    bucket = "ticket_almacen"
+resource "aws_s3_bucket" "bucket2"{
+    bucket = "ticket-almacen"
     tags = {
       ticket = "ticket"
     }
 }
 resource "aws_sqs_queue" "main"{
-    name                        = "queue-maletas"
+    name                        = "queueMaletas"
     delay_seconds               = 90
     max_message_size            = 2408
     message_retention_seconds   = 86400
@@ -171,7 +171,7 @@ resource "aws_sqs_queue" "main"{
     }
 }
 resource "aws_sqs_queue" "main_2"{
-    name                        = "queue-tickets"
+    name                        = "queueTickets"
     delay_seconds               = 90
     max_message_size            = 2408
     message_retention_seconds   = 86400
