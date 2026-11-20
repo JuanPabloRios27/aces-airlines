@@ -16,6 +16,9 @@ resource "aws_iam_role" "lambda_rol"{
         Effect="Allow", Action = "sts:AssumeRole", 
         Principal = { Service = "lambda.amazonaws.com" }}]})
 }
+resource "aws_sqs_queue" "dead_petitions"{
+    name = "dead_petitions_queue"
+}
 resource "aws_apigatewayv2_api" "http" {
     name            = "maleta-api"
     protocol_type   = "HTTP"
@@ -123,13 +126,13 @@ resource "aws_dynamodb_table" "tabla_2" {
 resource "aws_dynamodb_table" "tabla_3" {
   name          =   "autentification-db"
   billing_mode  =   "PROVISIONED" #Esto ayude para que llegue a la capa grautita
-  hash_key      =   "id" #Hash key es la partition key
+  hash_key      =   "auth_id" #Hash key es la partition key
   attribute {
-    name = "id"
+    name = "auth_id"
     type = "S"
   } 
   attribute {
-    name = "user-id"
+    name = "user_id"
     type = "S"
   } 
   global_secondary_index {
@@ -151,5 +154,33 @@ resource "aws_s3_bucket" "bucket_2"{
     bucket = "ticket_almacen"
     tags = {
       ticket = "ticket"
+    }
+}
+resource "aws_sqs_queue" "main"{
+    name                        = "queue-maletas"
+    delay_seconds               = 90
+    max_message_size            = 2408
+    message_retention_seconds   = 86400
+    receive_wait_time_seconds   = 10
+    redrive_policy = jsonencode({
+        deadLetterTargetArn = aws_sqs_queue.dead_petitions.arn
+        maxReceiveCount     = 9
+        })
+    tags = {
+        Environment = "production"
+    }
+}
+resource "aws_sqs_queue" "main_2"{
+    name                        = "queue-tickets"
+    delay_seconds               = 90
+    max_message_size            = 2408
+    message_retention_seconds   = 86400
+    receive_wait_time_seconds   = 10
+    redrive_policy = jsonencode({
+        deadLetterTargetArn     = aws_sqs_queue.dead_petitions.arn
+        maxReceiveCount         = 9
+    })
+    tags = {
+        Environment = "production"
     }
 }
