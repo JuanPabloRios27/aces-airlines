@@ -22,7 +22,7 @@ El sistema implementa seis flujos principales orientados a eventos:
 ## Arquitectura y Stack Tecnológico
 
 * **Proveedor Cloud:** Amazon Web Services (AWS)
-* **Lenguaje:** Python 3.11
+* **Lenguaje:** Python 3.11 y javascript
 * **Infraestructura como Código (IaC):** Terraform (`main.tf`)
 * **Servicios principales:**
   * **Amazon API Gateway:** Exposición de endpoints REST para consumo desde clientes (Postman o interfaz web).
@@ -40,6 +40,7 @@ El sistema implementa seis flujos principales orientados a eventos:
 | :--- | :--- | :--- |
 | API Gateway | `maleta-api` | Punto de entrada para la gestión y confirmación de maletas. |
 | API Gateway | `ticket-api` | Punto de entrada para la gestión, consulta y cancelación de tiquetes. |
+| Lambda | `aces-index` | Interfaz web, sesión donde se hace el respectivo check-in y registro de maletas para ser comprobadas de parte de los usuarios y gerentes de la aerolinea. |
 | Lambda | `maleta-lambda` | Lógica de creación y modificación de registros de maletas en la base de datos. |
 | Lambda | `maleta-confirmacion` | Lógica para confirmar el equipaje durante el check-in y almacenar su comprobante. |
 | Lambda | `ticket-lambda` | Lógica de creación, modificación y cancelación definitiva de tiquetes. |
