@@ -22,7 +22,7 @@ El sistema implementa seis flujos principales orientados a eventos:
 ## Arquitectura y Stack Tecnológico
 
 * **Proveedor Cloud:** Amazon Web Services (AWS)
-* **Lenguaje:** Terraform, Python 3.11 y javascript
+* **Lenguaje:** Python 3.11 y javascript
 * **Infraestructura como Código (IaC):** Terraform (`main.tf`)
 * **Servicios principales:**
   * **Amazon API Gateway:** Exposición de endpoints REST para consumo desde clientes (Postman o interfaz web).
