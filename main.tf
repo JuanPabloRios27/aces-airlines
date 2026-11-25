@@ -430,8 +430,8 @@ resource "aws_apigatewayv2_api" "api" {
 }
 
 resource "aws_apigatewayv2_stage" "default" {
-  for_each    = aws_apigatewayv2_api.api
-  api_id      = each.value.id
+  for_each    = toset(["maletas", "tickets"])
+  api_id      = aws_apigatewayv2_api.api[each.key].id
   name        = "$default"
   auto_deploy = true
 
