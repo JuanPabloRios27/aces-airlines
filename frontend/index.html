@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- Inicio · base común (los dos) -->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyCheck · ACES Airlines</title>
+  <link rel="icon" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="contenedor">
+        <div>
+          <h1>Tu vuelo,<br><em>sin filas.</em></h1>
+          <p class="lead">Registra tus maletas, haz check-in y gestiona tu reserva de ACES Airlines en un par de clics.</p>
+          <div class="hero-ruta"><span>BOG</span><span class="linea"></span><span>✈</span><span class="linea"></span><span>MDE</span></div>
+        </div>
+
+        <form class="card" id="form-buscar" novalidate>
+          <h2>Gestiona tu reserva</h2>
+          <p class="muted small">Escribe el código que te llegó al correo cuando compraste el tiquete.</p>
+          <div class="campo">
+            <label for="id_ticket">Código de reserva</label>
+            <input id="id_ticket" class="mayus" placeholder="SKY7Q2M4K" maxlength="12" autocomplete="off" required>
+          </div>
+          <div class="campo">
+            <label for="correo">Correo electrónico</label>
+            <input id="correo" type="email" placeholder="tucorreo@ejemplo.com" autocomplete="email" required>
+          </div>
+          <button class="btn coral bloque" data-cargando="Buscando…">Buscar mi reserva</button>
+          <div id="demo-ayuda" class="alerta info hidden" style="margin:1rem 0 0">
+            <div><b>Modo demo.</b> Prueba con <span class="mono">SKY7Q2M4K</span> / laura@demo.co
+              · <a href="#" id="llenar-demo">llenar datos</a></div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <div class="contenedor">
+      <div class="servicios" id="servicios"></div>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/mock.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/inicio.js"></script>
+</body>
+</html>
