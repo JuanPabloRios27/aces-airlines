@@ -1,43 +1,19 @@
-#Funcion para revisar el peso de la maleta
-#Main Funtion by python
-import boto3
-import json
+"""
+maleta-revisar  ·  Revisa el peso de una maleta antes de registrarla
+Responsable: Persona A (maletas)
 
-print('Loading function')
-dynamo = boto3.client('dynamodb')
+Ruta (maleta-api):
+  POST /maletas/revisar   body: {"tipo": "bodega"|"cabina", "peso_kg": 25.5}
+
+El front la llama mientras el pasajero escribe el peso, para mostrarle
+en vivo si la maleta pasa, cuánto exceso tiene y cuánto le cobrarían.
+"""
+from aces_comun import ErrorApi, api, requeridos, respuesta, revisar_peso
 
 
-def respond(err, res=None):
-    return {
-        'statusCode': '400' if err else '200',
-        'body': err.message if err else json.dumps(res),
-        'headers': {
-            'Content-Type': 'application/json',
-        },
-    }
-
-def lambda_handler(event, context):
-    '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
-    access to the request and response payload, including headers and
-    status code.
-
-    To scan a DynamoDB table, make a GET request with the TableName as a
-    query string parameter. To put, update, or delete an item, make a POST,
-    PUT, or DELETE request respectively, passing in the payload to the
-    DynamoDB API as a JSON body.
-    '''
-    #print("Received event: " + json.dumps(event, indent=2))
-
-    operations = {
-        'DELETE': lambda dynamo, x: dynamo.delete_item(**x),
-        'GET': lambda dynamo, x: dynamo.scan(**x),
-        'POST': lambda dynamo, x: dynamo.put_item(**x),
-        'PUT': lambda dynamo, x: dynamo.update_item(**x),
-    }
-
-    operation = event['httpMethod']
-    if operation in operations:
-        payload = event['queryStringParameters'] if operation == 'GET' else json.loads(event['body'])
-        return respond(None, operations[operation](dynamo, payload))
-    else:
-        return respond(ValueError('Unsupported method "{}"'.format(operation)))
+@api
+def lambda_handler(req, context):
+    if req.ruta != "POST /maletas/revisar":
+        raise ErrorApi(404, f"Ruta no soportada: {req.ruta}")
+    requeridos(req.body, "tipo", "peso_kg")
+    return respuesta(200, revisar_peso(req.body["tipo"], req.body["peso_kg"]))

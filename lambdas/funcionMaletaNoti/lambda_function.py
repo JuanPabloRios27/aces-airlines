@@ -1,42 +1,43 @@
-#Main Funtion by python
-import boto3
-import json
+"""
+maleta-notification  ·  Envía por correo (SES) los avisos de maletas
+Responsable: Persona A (maletas)
 
-print('Loading function')
-dynamo = boto3.client('dynamodb')
+Se dispara con los mensajes de la cola SQS "queueMaletas".
+Mensajes que entiende:
+  {"tipo": "maleta_confirmada", "id_maleta": "MALXXXXXX"}
+"""
+from aces_comun import (
+    TABLA_MALETAS, enviar_correo, fmt_kg, obtener_ticket, plantilla_correo, procesar_cola, tabla,
+)
 
-
-def respond(err, res=None):
-    return {
-        'statusCode': '400' if err else '200',
-        'body': err.message if err else json.dumps(res),
-        'headers': {
-            'Content-Type': 'application/json',
-        },
-    }
 
 def lambda_handler(event, context):
-    '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
-    access to the request and response payload, including headers and
-    status code.
+    return procesar_cola(event, procesar)
 
-    To scan a DynamoDB table, make a GET request with the TableName as a
-    query string parameter. To put, update, or delete an item, make a POST,
-    PUT, or DELETE request respectively, passing in the payload to the
-    DynamoDB API as a JSON body.
-    '''
-    #print("Received event: " + json.dumps(event, indent=2))
 
-    operations = {
-        'DELETE': lambda dynamo, x: dynamo.delete_item(**x),
-        'GET': lambda dynamo, x: dynamo.scan(**x),
-        'POST': lambda dynamo, x: dynamo.put_item(**x),
-        'PUT': lambda dynamo, x: dynamo.update_item(**x),
-    }
+def procesar(msg):
+    if msg.get("tipo") != "maleta_confirmada":
+        print("Mensaje ignorado:", msg)
+        return
 
-    operation = event['httpMethod']
-    if operation in operations:
-        payload = event['queryStringParameters'] if operation == 'GET' else json.loads(event['body'])
-        return respond(None, operations[operation](dynamo, payload))
-    else:
-        return respond(ValueError('Unsupported method "{}"'.format(operation)))
+    maleta = tabla(TABLA_MALETAS).get_item(Key={"id_maleta": msg["id_maleta"]}).get("Item")
+    if not maleta:
+        print("La maleta ya no existe:", msg)
+        return
+    ticket = obtener_ticket(maleta["id_ticket"])
+
+    cargo = int(maleta.get("cargo_exceso", 0))
+    parrafos = [
+        f"Hola {ticket.get('nombre', '')},",
+        f"Tu maleta de <b>{maleta['tipo']}</b> ({fmt_kg(maleta['peso_kg'])} kg) fue "
+        f"<b>confirmada</b> para el vuelo <b>{ticket['vuelo']}</b> "
+        f"{ticket['origen']} → {ticket['destino']}.",
+        f"Número de maleta: <b>{maleta['id_maleta']}</b>",
+    ]
+    if cargo:
+        parrafos.append(f"Cargo por exceso de peso: <b>${cargo:,} COP</b>".replace(",", "."))
+    enviar_correo(
+        ticket["id_propietario"],
+        f"Maleta confirmada · {ticket['vuelo']} · {maleta['id_maleta']}",
+        plantilla_correo("Tu maleta está confirmada ✈", parrafos),
+    )

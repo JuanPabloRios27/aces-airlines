@@ -1,0 +1,7 @@
+# Copia este archivo como terraform.tfvars y llena tus datos (terraform.tfvars NO se sube a git)
+correo_remitente    = "skycheck.aces@gmail.com"          # correo desde el que se envían los avisos
+correos_verificados = ["mari@gmail.com", "tu@gmail.com"]  # quienes van a RECIBIR correos en las pruebas
+agent_key           = "cambia-esta-clave"                 # clave del panel de agentes
+
+# Solo si tu cuenta no deja crear roles IAM (AWS Academy / Learner Lab):
+# rol_lambda_existente_arn = "arn:aws:iam::123456789012:role/LabRole"
