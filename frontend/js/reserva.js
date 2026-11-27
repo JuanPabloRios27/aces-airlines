@@ -44,6 +44,13 @@ function pintar(t) {
   else if (t.estado === "checkin")
     aviso = `<div class="alerta ok"><div><b>¡Check-in listo!</b> Tu pasabordo está disponible y te lo enviamos al correo.</div></div>`;
 
+  // Aviso que deja otra página antes de volver aquí (ej: modificar.html al guardar)
+  const pendiente = sessionStorage.getItem("skycheck.aviso");
+  if (pendiente) {
+    sessionStorage.removeItem("skycheck.aviso");
+    aviso = `<div class="alerta ok"><div>${pendiente}</div></div>` + aviso;
+  }
+
   app.innerHTML = `
     <div class="encabezado">
       <h1>Hola, ${esc(t.nombre.split(" ")[0])} 👋</h1>

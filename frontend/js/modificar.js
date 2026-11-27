@@ -104,11 +104,10 @@ async function guardar(e) {
   try {
     const r = await SkyUI.conCarga(document.getElementById("guardar"), () => SkyAPI.modificarReserva(ses.id_ticket, datos));
     const nombres = { asiento: "Asiento", telefono: "Teléfono", nombre: "Nombre" };
-    const lista = Object.entries(r.cambios).map(([k, v]) => `${nombres[k] || k}: <b>${esc(v)}</b>`).join("<br>");
-    SkyUI.toast(`<b>Reserva actualizada</b><br>${lista}`, "ok");
-    ticket = r.ticket;
-    elegido = null;
-    pintar();
+    const lista = Object.entries(r.cambios).map(([k, v]) => `${nombres[k] || k}: <b>${esc(v)}</b>`).join(" · ");
+    // Volver a "Mi reserva" y mostrar allá el aviso de que se guardó
+    sessionStorage.setItem("skycheck.aviso", `<b>¡Cambios guardados!</b> ${lista}. Te enviamos un correo con el resumen.`);
+    location.href = "reserva.html";
   } catch (err) {
     SkyUI.error(err);
   }
